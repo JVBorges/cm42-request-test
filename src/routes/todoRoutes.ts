@@ -18,9 +18,14 @@ export async function todoRoutes(app: FastifyInstance) {
     return todo
   })
 
-  app.post('/', async (request) => {
+  app.post('/', async (request, reply) => {
     const todo = request.body as { title: string }
-    return await Todo.query().insert(todo)
+
+    if (!todo) {
+      return reply.status(400).send({ error: "title is required"})
+    }
+  
+    return await Todo.query().insertAndFetch(todo)
   })
 
   app.put('/:id', async (request, reply) => {
